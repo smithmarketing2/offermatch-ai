@@ -297,10 +297,20 @@ export default function Home() {
 
         <div className="quizGrid">
           <div className="quizPanel">
-            <div className="progressWrap">
-              <span>{completed} of {questions.length} answered</span>
-              <span>{progress}%</span>
-              <div className="progress"><span style={{ width: `${progress}%` }} /></div>
+            <div className="quizToolbar">
+              <div className="progressWrap">
+                <span>{completed} of {questions.length} answered</span>
+                <span>{progress}%</span>
+                <div className="progress"><span style={{ width: `${progress}%` }} /></div>
+              </div>
+              <button
+                className="smallReset"
+                type="button"
+                onClick={resetQuiz}
+                disabled={completed === 0 && !email && captureStatus === 'idle'}
+              >
+                Reset Quiz
+              </button>
             </div>
 
             {questions.map((question, index) => (

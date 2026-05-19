@@ -112,3 +112,9 @@ details p { margin: 12px 0 0; }
 }
 .leadBox button:disabled { opacity: .7; cursor: wait; }
 .error { color: #dc2626; font-weight: 800; margin: 10px 0 0; }
+.quizToolbar { display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: start; margin-bottom: 18px; }
+.quizToolbar .progressWrap { margin-bottom: 0; }
+.smallReset { border: 1px solid var(--line); background: white; color: var(--muted); border-radius: 14px; padding: 10px 13px; font-weight: 900; cursor: pointer; white-space: nowrap; }
+.smallReset:hover:not(:disabled) { color: var(--blue); border-color: rgba(37, 99, 235, .45); background: rgba(37, 99, 235, .06); }
+.smallReset:disabled { opacity: .45; cursor: not-allowed; }
+@media (max-width: 620px) { .quizToolbar { grid-template-columns: 1fr; } .smallReset { justify-self: start; } }
