@@ -110,3 +110,5 @@ details p { margin: 12px 0 0; }
   .leadBox form { grid-template-columns: 1fr; }
   .footer { flex-direction: column; }
 }
+.leadBox button:disabled { opacity: .7; cursor: wait; }
+.error { color: #dc2626; font-weight: 800; margin: 10px 0 0; }

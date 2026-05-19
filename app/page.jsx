@@ -193,6 +193,8 @@ export default function Home() {
   const [answers, setAnswers] = useState({});
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [captureStatus, setCaptureStatus] = useState('idle');
+  const [captureMessage, setCaptureMessage] = useState('');
   const completed = questions.filter((q) => answers[q.key]).length;
   const progress = Math.round((completed / questions.length) * 100);
   const ready = completed === questions.length;
@@ -207,7 +209,50 @@ export default function Home() {
     setAnswers({});
     setEmail('');
     setSubmitted(false);
+    setCaptureStatus('idle');
+    setCaptureMessage('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function submitLead(event) {
+    event.preventDefault();
+    if (!profile) return;
+
+    setCaptureStatus('loading');
+    setCaptureMessage('');
+
+    try {
+      const response = await fetch('/api/capture-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          answers,
+          result: {
+            title: profile.title,
+            label: profile.label,
+            badge: profile.badge
+          },
+          page: typeof window !== 'undefined' ? window.location.href : ''
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || 'Something went wrong.');
+      }
+
+      setSubmitted(true);
+      setCaptureStatus(data.captured ? 'captured' : 'ready');
+      setCaptureMessage(
+        data.captured
+          ? 'Success — your full plan request was captured.'
+          : 'Success — the form is live. Add a webhook or VBOUT list in Vercel to forward leads automatically.'
+      );
+    } catch (error) {
+      setCaptureStatus('error');
+      setCaptureMessage(error.message || 'Lead capture failed. Please try again.');
+    }
   }
 
   return (
@@ -307,7 +352,7 @@ export default function Home() {
                 <div className="leadBox">
                   <h4>Want the full plan?</h4>
                   <p>Get your personalized affiliate promotion plan with content angles, an offer research checklist, and beginner action steps.</p>
-                  <form onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }}>
+                  <form onSubmit={submitLead}>
                     <input
                       type="email"
                       placeholder="Enter your email"
@@ -315,9 +360,9 @@ export default function Home() {
                       onChange={(event) => setEmail(event.target.value)}
                       required
                     />
-                    <button type="submit">Send My Full Plan</button>
+                    <button type="submit" disabled={captureStatus === 'loading'}>{captureStatus === 'loading' ? 'Sending…' : 'Send My Full Plan'}</button>
                   </form>
-                  {submitted && <p className="success">Great — this MVP form is ready to connect to your email platform or webhook.</p>}
+                  {captureMessage && <p className={captureStatus === 'error' ? 'error' : 'success'}>{captureMessage}</p>}
                 </div>
                 <button className="button reset" type="button" onClick={resetQuiz}>Retake Quiz</button>
               </div>
